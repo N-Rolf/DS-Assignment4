@@ -15,7 +15,7 @@ using namespace std;
 
 
 /********************************************************************
-***  FUNCTION Queue300                                            ***
+***  FUNCTION Queue                                            ***
 *********************************************************************
 ***  DESCRIPTION   : This is the constructor for the queue        ***
 ***  INPUT ARGS    : none                                         ***
@@ -24,48 +24,42 @@ using namespace std;
 ***  RETURN        : none                                         ***
 ********************************************************************/
 
-Queue300::Queue300():front(NULL),rear(NULL)
+Queue::Queue(short size=2):Q_SIZE{size}
 {
-
-
-
-
+    queue = new QElement[Q_SIZE];
+    head = 0;
+    tail = 0;
 }
 
 /********************************************************************
-***  FUNCTION Queue300(Queue300 & old)                            ***
+***  FUNCTION Queue(Queue & old)                            ***
 *********************************************************************
 ***  DESCRIPTION   : This is the copy constructor for the queue   ***
-***  INPUT ARGS    : pointer to a Queue300 object                 ***
+***  INPUT ARGS    : pointer to a Queue object                 ***
 ***  OUTPUT ARGS   : none                                         ***
 ***  IN/OUT ARGS   : none                                         ***
 ***  RETURN        : none                                         ***
 ********************************************************************/
 
 
-Queue300::Queue300(Queue300 & old):front(NULL),rear(NULL)
+Queue::Queue(Queue & old) : head(old.head),tail(old.tail),Q_SIZE(old.Q_SIZE)
 {
+    cout << "Copying..." << endl;
 
-Element300 element;
+    QElement element;
+    queue = new QElement[old.Q_SIZE];
 
-Queue300 temp;
-while(old.front != NULL){
-     old.deQueue300(element);
-    temp.enQueue300(element);
-
-    }
-while(temp.rear != NULL){
-
-    temp.deQueue300(element);
-    enQueue300(element);
-    old.enQueue300(element);
-
-    }
+    while(old.head != NULL){
+        //element = old.dequeue;
+        // temp.enqueue(element);
+        // same as ^^
+        enqueue(old.dequeue());
+        }
 
 }
 
 /********************************************************************
-***  FUNCTION ~Queue300                                           ***
+***  FUNCTION ~Queue                                           ***
 *********************************************************************
 ***  DESCRIPTION   : This is the destructor for the queue         ***
 ***  INPUT ARGS    : none                                         ***
@@ -73,84 +67,89 @@ while(temp.rear != NULL){
 ***  IN/OUT ARGS   : none                                         ***
 ***  RETURN        : none                                         ***
 ********************************************************************/
-Queue300::~Queue300()
+Queue::~Queue()
 {
+    cout << "Destroying..." << endl;
 
-while(rear != NULL){
-    deQueue300(front->element);
-    }
+    while(head != NULL){
+        dequeue();
+        }
 
+    delete queue;
 
 }
 
 /********************************************************************
-***  FUNCTION enQueue300                                          ***
+***  FUNCTION enqueue                                          ***
 *********************************************************************
-***  DESCRIPTION   : This function ands a new element300 to our Queue,
+***  DESCRIPTION   : This function ands a new Element to our Queue,
 ***                : which is passed in from the driver           ***
-***  INPUT ARGS    : const Element300                             ***
+***  INPUT ARGS    : const Element                             ***
 ***  OUTPUT ARGS   : none                                         ***
 ***  IN/OUT ARGS   : none                                         ***
 ***  RETURN        : none                                         ***
 ********************************************************************/
-void Queue300::enQueue300(const Element300 enQueue)
+void Queue::enqueue(const QElement enqueue)
 {
+    if(isFull())
+        {
+            cout << "Stack is full. Cannot add." << endl;
+            return;
+        }
+    
+    int index = head;
 
-NodePtr300 temp = new (std::nothrow) Node300;
-if( temp!= NULL)
-{
-    strcpy(temp->element, enQueue);
-    temp->next = NULL;
-    if(front == NULL){
-    rear = temp;
-    front = temp;
+    while(queue[index] != NULL)
+    {
+        index++;
     }
+    queue[index] = enqueue;
 
-    else{
-        rear->next = temp;
-        rear = temp;
-    }
-
-    rear->next = NULL;
-    temp =  NULL;
-}
+    if(tail == Q_SIZE-1)
+        {
+            tail = 0;
+        }
+        else
+        {
+            tail++;
+        }
 
 }
 
 /********************************************************************
-***  FUNCTION DeQueue300                                          ***
+***  FUNCTION dequeue                                          ***
 *********************************************************************
-***  DESCRIPTION   : This function removes a element from the     ***
+***  DESCRIPTION   : This function removes a QElement from the     ***
 ***                : front of the queue also test is queue is empty***
-***  INPUT ARGS    : Element300                                   ***
+***  INPUT ARGS    : QElement                                   ***
 ***  OUTPUT ARGS   : none                                         ***
 ***  IN/OUT ARGS   : none                                         ***
 ***  RETURN        : none                                         ***
 ********************************************************************/
-void Queue300::deQueue300(Element300 element)
+QElement Queue::dequeue()
 {
-
-if(front != NULL){
-    strcpy(element,front->element);
-    NodePtr300 temp = NULL;
-    temp = front;
-    front = front->next;
-    temp->next = NULL;
-    temp = NULL;
-    delete temp;
-
-        if(front == NULL){
-            rear = NULL;
-            }
+    if(isEmpty())
+        {
+            cout << "Stack is empty. Cannot delete." << endl;
+            return;
+        }
+    
+    QElement temp = queue[head];
+    queue[head] = NULL;
+    if(head == Q_SIZE-1)
+    {
+        head = 0;
     }
-else{
-    cout<<"Queue empty from deQueue300"<<endl;
+    else
+    {
+        head++;
     }
-
+    
+    return temp;
 }
 
 /********************************************************************
-***  FUNCTION view300                                             ***
+***  FUNCTION view                                                ***
 *********************************************************************
 ***  DESCRIPTION   : This displays the queue from front to rear   ***
 ***  INPUT ARGS    : none                                         ***
@@ -159,26 +158,73 @@ else{
 ***  RETURN        : none                                         ***
 ********************************************************************/
 
-void Queue300::view300()
+void Queue::view()
 {
+    short i = head;
 
-Element300 element;
+    cout << "HEAD";
 
-Queue300 temp ;
-cout<<"FRONT->";
-while(rear != NULL){
+    while(i != tail)
+    {
+        cout << "->" << queue[i];
+        if(i == Q_SIZE-1)
+        {
+            i=0;
+        }
+        else
+        {
+            i++;
+        }
+    }
+    cout << "TAIL" << endl;
 
-    deQueue300(element);
-    cout<<element<<"->";
-    temp.enQueue300( element);
+}
 
+/********************************************************************
+***  FUNCTION isFull                                                ***
+*********************************************************************
+***  DESCRIPTION   : This displays the queue from front to rear   ***
+***  INPUT ARGS    : none                                         ***
+***  OUTPUT ARGS   : none                                         ***
+***  IN/OUT ARGS   : none                                         ***
+***  RETURN        : none                                         ***
+********************************************************************/
+bool Queue::isFull() const
+{
+    bool isFull = true;
+    
+    for(int i=0; i < Q_SIZE; i++)
+    {
+        if(queue[i] == NULL)
+        {
+            isFull = false;
+        }
     }
 
-while(temp.rear != NULL){
-      temp.deQueue300(element);
-    enQueue300(element);
+    return isFull;
+}
 
+/********************************************************************
+***  FUNCTION isEmpty                                                ***
+*********************************************************************
+***  DESCRIPTION   : This displays the queue from front to rear   ***
+***  INPUT ARGS    : none                                         ***
+***  OUTPUT ARGS   : none                                         ***
+***  IN/OUT ARGS   : none                                         ***
+***  RETURN        : none                                         ***
+********************************************************************/
+bool Queue::isEmpty() const 
+{
+    
+    bool isEmpty = true;
+    
+    for(int i=0; i < Q_SIZE; i++)
+    {
+        if(queue[i] != NULL)
+        {
+            isEmpty = false;
+        }
     }
-cout<<"REAR"<<endl;
 
+    return isEmpty;
 }

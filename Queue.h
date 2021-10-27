@@ -6,10 +6,10 @@ typedef string QElement;
 class Queue
 {
     public:
-        Queue(...);
+        Queue(short size=2);
         Queue(Queue &);
         ~Queue();
-        void enqueue(const Element);
+        void enqueue(const QElement);
         QElement dequeue();
         void view();
         bool isEmpty() const;
@@ -17,7 +17,7 @@ class Queue
     private:
         const short Q_SIZE;
         typedef QElement * QPointer;
-        QPointer Queue;
+        QPointer queue;
         short head, tail;
 };
 
