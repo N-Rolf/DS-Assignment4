@@ -1,5 +1,6 @@
 #ifndef _QUEUE_H
-#include <string>
+#define _QUEUE_H
+//#include <string>
 
 typedef string QElement;
 
